@@ -66,4 +66,44 @@ object RapidString {
     final def rapid(arguments: Any*) = macro rapid_impl
   }
 
+
+    implicit final class LongFilled(val underlying: Long) extends AnyVal {
+      @inline
+      final def filled(minWidth: Int, filledChar: Char = ' ', radix: Int = 10) = {
+        val unfilled = java.lang.Long.toString(underlying, radix)
+        if (unfilled.length < minWidth) {
+          if (underlying >= 0 || filledChar == ' ') {
+            new String(Array.fill(minWidth - unfilled.length)(filledChar)) + unfilled
+          } else {
+            "-" + new String(Array.fill(minWidth - unfilled.length)(filledChar)) + unfilled.substring(1)
+          }
+        } else {
+          unfilled
+        }
+      }
+    }
+
+    implicit final class IntFilled(val underlying: Int) extends AnyVal {
+      @inline
+      final def filled(minWidth: Int, filledChar: Char = ' ', radix: Int = 10) = {
+        val unfilled = java.lang.Integer.toString(underlying, radix)
+        if (unfilled.length < minWidth) {
+          if (underlying >= 0 || filledChar == ' ') {
+            new String(Array.fill(minWidth - unfilled.length)(filledChar)) + unfilled
+          } else {
+            "-" + new String(Array.fill(minWidth - unfilled.length)(filledChar)) + unfilled.substring(1)
+          }
+        } else {
+          unfilled
+        }
+      }
+    }
+
+    import language.implicitConversions
+    @inline
+    implicit final def byteFilled(byte: Byte) = new IntFilled(byte)
+
+    @inline
+    implicit final def shortFilled(short: Short) = new IntFilled(short)
+
 }
